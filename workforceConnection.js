@@ -268,6 +268,7 @@ const removeEmployee = (lastName) => {
 connection.connect((err) => {
     if (err) throw err;
     console.log(`connected as id ${connection.threadId}`);
+    console.log(`\n------- Welcome to the Employee Tracker -------\n`);
     mainMenu();
 
 
