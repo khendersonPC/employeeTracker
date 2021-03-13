@@ -23,6 +23,9 @@
 
 * Install NPM packages--> npm install
 
+* npm install mysql, inquirer, util, printTable
+
+* Add your own password for sql
 ## Usage
 Video at https://drive.google.com/file/d/1mG4ys6_L1BIFuGKqHpQvR3yga_9fMW1e/view
 
