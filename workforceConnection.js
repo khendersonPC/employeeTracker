@@ -2,7 +2,6 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const util = require('util');
 const { printTable } = require("console-table-printer");
-//I need to make an array of managers so that I can populate the choices in the Update Employee Manager.
 const connection = mysql.createConnection({
     host: 'localhost',
 
@@ -215,8 +214,6 @@ async function mainMenu() {
 }
 
 
-
-
 const displayByDepart = () => {
 
     connection.query(`SELECT workforceDB.department.name, workforceDB.employee.last_name
@@ -266,61 +263,11 @@ const removeEmployee = (lastName) => {
 
 };
 
-const updateEmployRole = (lastName, newRole) => {
-    const query = connection.query(`UPDATE workforceDB.employee
-    SET workforceDB.employee.role_id = (SELECT workforceDB.role.id FROM workforceDB.role WHERE workforceDB.role.title="${newRole}")
-    WHERE workforceDB.employee.last_name="${lastName}"`, (err, res) => {
-            if (err) throw err;
-            console.log("Employee Role Updated");
-            mainMenu();
-        });
 
-};
-
-const updateEmployMan = (lastName, newDepart) => {
-    const query = connection.query(`UPDATE workforceDB.employee
-    SET workforceDB.employee.role_id = (SELECT workforceDB.role.id FROM workforceDB.role WHERE workforceDB.role.title="${newRole}")
-    WHERE workforceDB.employee.last_name="${lastName}"`, (err, res) => {
-            if (err) throw err;
-            console.log("Employee Role Updated");
-            mainMenu();
-        });
-
-};
-
-
-//turns function into async function
-const create = async (first, last, roleChoice, managerChoice) => {
-    console.log(roleChoice);
-    const { id } = await connection.query(`SELECT id FROM workforceDB.role WHERE title= "${roleChoice}"`);
-    console.log("id " + id);
-    //console.log(roleChoice);
-    const { manId } = await connection.query(`SELECT id from workforceDB.employee WHERE last_name="${managerChoice}"`);
-    console.log("manId: " + id);
-    connection.query(
-        `INSERT INTO employee SET ?`,
-        {
-            first_name: first,
-            last_name: last,
-            role_id: id,
-            manager_id: manId,
-        },
-        (err, res) => {
-            if (err) throw err;
-            console.log(`${res.affectedRows} employee inserted!\n`);
-            // Call updateProduct AFTER the INSERT completes
-            //updateWorkforce();
-        }
-
-    )
-};
 
 connection.connect((err) => {
     if (err) throw err;
     console.log(`connected as id ${connection.threadId}`);
-    //display("employee");
-    // create("employee", "Chris", "Humbert");
-    // display("employee");
     mainMenu();
 
 
