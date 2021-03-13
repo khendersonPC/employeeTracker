@@ -1,58 +1,152 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
+const util = require('util');
 const { printTable } = require("console-table-printer");
 //I need to make an array of managers so that I can populate the choices in the Update Employee Manager.
+const connection = mysql.createConnection({
+    host: 'localhost',
 
-const managers= [];
+    // Your port, if not 3306
+    port: 3306,
 
-function mainMenu() {
-    const mainMenu = [
+    // Your username
+    user: 'root',
+
+    // Be sure to update with your own MySQL password!
+    password: 'Salami?1',
+    database: 'workforceDB',
+});
+
+const query = util.promisify(connection.query).bind(connection);
+
+async function mainMenu() {
+    const menu = [
         {
             type: 'list',
             name: 'main',
             message: 'Main Menu: ',
-            choices: ["View All Employees", "View Employees by Department", "View Employees by Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager"],
+            choices: ["View All Employees", "View Departments", "View Roles", "View Employees by Department", "View Employees by Manager", "Add Employee", "Add Department", "Add Role", "Remove Employee", "Update Employee Role", "Update Employee Manager" ],
         },
     ]
+    //returns an array of objects with a row data package
+    const roles = await query("SELECT * FROM role ORDER BY title");
+    //convert into an array
+    const newRoles = roles.map(role => {
+        return {
+            name: role.title,
+            value: role.id
+        }
+    })
 
-    inquirer.prompt(mainMenu).then((data) => {
+    const lastNames = await query("SELECT * FROM employee ORDER BY last_name");
+    //convert into an array
+    const newLastNames = lastNames.map(man => {
+        return {
+            name: man.last_name,
+            value: man.id
+        }
+    })
 
-        if (data.main === "Add Employee") {
+    const departNames = await query("SELECT * FROM department ORDER BY name");
+    //convert into an array
+    const newDepartmenttNames = departNames.map(dep => {
+        return {
+            name: dep.name,
+            value: dep.id
+        }
+    })
+
+    inquirer.prompt(menu).then((data) => {
+
+        if (data.main == "Add Employee") {
             const secMenu = [
                 {
                     type: 'input',
-                    name: 'firstName',
+                    name: 'first_name',
                     message: 'First Name? ',
 
                 },
                 {
                     type: 'input',
-                    name: 'lastName',
+                    name: 'last_name',
                     message: 'Last Name? ',
 
                 },
                 {
                     type: 'list',
-                    name: 'role',
+                    name: 'role_id',
                     message: 'What is the employees role? ',
-                    choices: ["Superintendent", "Principal", "Vice Principal", "General Office Admin", "Teacher", "Teachers Aide"],
+                    choices: newRoles
                 },
                 {
                     type: 'list',
-                    name: 'manager',
+                    name: 'manager_id',
                     message: 'Who is the employees manager? ',
-                    choices: ["Hooker", "Arlington"],
+                    choices: newLastNames
                 },
             ]
 
 
-            inquirer.prompt(secMenu).then((data) => {
-                create(data.firstName, data.lastName, data.role, data.manager);
+            inquirer.prompt(secMenu).then(async (data) => {
+                console.log(data);
+                await query("INSERT into employee SET ?", data);
+                console.log("New employee has been added!");
+                mainMenu();
             });
         }
 
+        if(data.main=="Add Role"){
+            const secMenu = [
+                {
+                    type: 'input',
+                    name: 'title',
+                    message: 'What role would you like to add? ',
+                },
+                {
+                    type: 'input',
+                    name: 'salary',
+                    message: 'Salary? ',
+                },
+                {
+                    type: 'list',
+                    name: 'department_id',
+                    message: 'Select the department: ',
+                    choices: newDepartmenttNames,
+                }]
+            inquirer.prompt(secMenu).then(async (data) => {
+                console.log("New role has been added.");
+               await query("INSERT INTO role SET  ? ",data)
+               mainMenu();
+            });
+
+        }
+
+        if(data.main=="Add Department"){
+            const secMenu = [
+                {
+                    type: 'input',
+                    name: 'name',
+                    message: 'What department would you like to add? ',
+                },
+                ]
+            inquirer.prompt(secMenu).then(async (data) => {
+                console.log("New role has been added.");
+               await query("INSERT INTO department SET  ? ", data)
+               mainMenu();
+            });
+
+        }
+        
         if (data.main === "View All Employees") {
             displayAll("workforceDB.employee");
+        }
+
+        if (data.main === "View Roles") {
+            displayAll("workforceDB.role");
+        }
+
+        if (data.main === "View Departments") {
+            displayAll("workforceDB.department");
         }
 
         if (data.main === "View Employees By Department") {
@@ -79,61 +173,51 @@ function mainMenu() {
         if (data.main == "Update Employee Role") {
             const secMenu = [
                 {
-                    type: 'input',
-                    name: 'lastName',
+                    type: 'list',
+                    name: 'id',
                     message: 'What is the last name of the employee to update? ',
-                },]
-            inquirer.prompt(secMenu).then((data) => {
-                const terMenu = [
-                    {
-                        type: 'list',
-                        name: 'newRole',
-                        message: 'Select the new role: ',
-                        choices: ["Superintendent", "Principal", "Vice Pricipal", "Program Director", "Teacher", "Classified Staff"],
-                    },]
-                inquirer.prompt(terMenu).then((data) => {
-                    updateEmployRole(data.lastName, data.newRole);
-                });
-            });
-        }
-        if (data.main == "Update Employee Manager") {
-            const secMenu = [
+                    choices: newLastNames,
+                },
                 {
-                    type: 'input',
-                    name: 'lastName',
-                    message: 'What is the last name of the employee to update? ',
-                },]
-            inquirer.prompt(secMenu).then((data) => {
-                const terMenu = [
-                    {
-                        type: 'list',
-                        name: 'newMan',
-                        message: 'Select the new manager: ',
-                        choices: ["Hooker", "Arlington"],
-                    },]
-                inquirer.prompt(terMenu).then((data) => {
-                    updateEmployMan(data.lastName, data.newMan);
-                });
+                    type: 'list',
+                    name: 'roleID',
+                    message: 'Select the new role: ',
+                    choices: newRoles,
+                }]
+            inquirer.prompt(secMenu).then(async (data) => {
+                console.log("Employee role has been updated.");
+               await query("UPDATE employee SET role_id = ? WHERE id=?",[data.roleID,data.id])
+               mainMenu();
             });
+
         }
+        
+       
+        // if (data.main == "Update Employee Manager") {
+        //     const secMenu = [
+        //         {
+        //             type: 'input',
+        //             name: 'lastName',
+        //             message: 'What is the last name of the employee to update? ',
+        //         },]
+        //     inquirer.prompt(secMenu).then((data) => {
+        //         const terMenu = [
+        //             {
+        //                 type: 'list',
+        //                 name: 'newMan',
+        //                 message: 'Select the new manager: ',
+        //                 choices: ["Hooker", "Arlington"],
+        //             },]
+        //         inquirer.prompt(terMenu).then((data) => {
+        //             updateEmployMan(data.lastName, data.newMan);
+        //         });
+        //     });
+        // }
     });
 }
 
 
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-
-    // Your port, if not 3306
-    port: 3306,
-
-    // Your username
-    user: 'root',
-
-    // Be sure to update with your own MySQL password!
-    password: 'Salami?1',
-    database: 'workforceDB',
-});
 
 const displayByDepart = () => {
 

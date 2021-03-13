@@ -19,6 +19,7 @@
   "dependencies": {
     "console-table-printer": "^2.8.1",
     "inquirer": "^8.0.0",
-    "mysql": "^2.18.1"
+    "mysql": "^2.18.1",
+    "util": "^0.12.3"
   }
 }
