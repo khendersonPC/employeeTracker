@@ -25,7 +25,7 @@ async function mainMenu() {
             type: 'list',
             name: 'main',
             message: 'Main Menu: ',
-            choices: ["View All Employees", "View Departments", "View Roles", "View Employees by Department", "View Employees by Manager", "Add Employee", "Add Department", "Add Role", "Remove Employee", "Update Employee Role", "Update Employee Manager" ],
+            choices: ["View All Employees", "View Departments", "View Roles", "View Employees By Department", "View Employees by Manager", "Add Employee", "Add Department", "Add Role", "Remove Employee", "Update Employee Role", "Update Employee Manager"],
         },
     ]
     //returns an array of objects with a row data package
@@ -95,7 +95,7 @@ async function mainMenu() {
             });
         }
 
-        if(data.main=="Add Role"){
+        if (data.main == "Add Role") {
             const secMenu = [
                 {
                     type: 'input',
@@ -115,29 +115,29 @@ async function mainMenu() {
                 }]
             inquirer.prompt(secMenu).then(async (data) => {
                 console.log("New role has been added.");
-               await query("INSERT INTO role SET  ? ",data)
-               mainMenu();
+                await query("INSERT INTO role SET  ? ", data)
+                mainMenu();
             });
 
         }
 
-        if(data.main=="Add Department"){
+        if (data.main == "Add Department") {
             const secMenu = [
                 {
                     type: 'input',
                     name: 'name',
                     message: 'What department would you like to add? ',
                 },
-                ]
+            ]
             inquirer.prompt(secMenu).then(async (data) => {
                 console.log("New role has been added.");
-               await query("INSERT INTO department SET  ? ", data)
-               mainMenu();
+                await query("INSERT INTO department SET  ? ", data)
+                mainMenu();
             });
 
         }
-        
-        if (data.main === "View All Employees") {
+
+        if (data.main == "View All Employees") {
             displayAll("workforceDB.employee");
         }
 
@@ -149,7 +149,7 @@ async function mainMenu() {
             displayAll("workforceDB.department");
         }
 
-        if (data.main === "View Employees By Department") {
+        if (data.main == "View Employees By Department") {
             displayByDepart();
         }
 
@@ -186,33 +186,31 @@ async function mainMenu() {
                 }]
             inquirer.prompt(secMenu).then(async (data) => {
                 console.log("Employee role has been updated.");
-               await query("UPDATE employee SET role_id = ? WHERE id=?",[data.roleID,data.id])
-               mainMenu();
+                await query("UPDATE employee SET role_id = ? WHERE id=?", [data.roleID, data.id])
+                mainMenu();
             });
-
         }
-        
-       
-        // if (data.main == "Update Employee Manager") {
-        //     const secMenu = [
-        //         {
-        //             type: 'input',
-        //             name: 'lastName',
-        //             message: 'What is the last name of the employee to update? ',
-        //         },]
-        //     inquirer.prompt(secMenu).then((data) => {
-        //         const terMenu = [
-        //             {
-        //                 type: 'list',
-        //                 name: 'newMan',
-        //                 message: 'Select the new manager: ',
-        //                 choices: ["Hooker", "Arlington"],
-        //             },]
-        //         inquirer.prompt(terMenu).then((data) => {
-        //             updateEmployMan(data.lastName, data.newMan);
-        //         });
-        //     });
-        // }
+        if (data.main == "Update Employee Manager") {
+            const secMenu = [
+                {
+                    type: 'list',
+                    name: 'id',
+                    message: 'What is the last name of the employee to update? ',
+                    choices: newLastNames,
+                },
+                {
+                    type: 'list',
+                    name: 'manager_id',
+                    message: 'Select the new role: ',
+                    choices: newLastNames,
+                }]
+            inquirer.prompt(secMenu).then(async (data) => {
+                console.log("Employee manager has been updated.");
+                await query("UPDATE employee SET manager_id = ? WHERE id=?", [data.manager_id, data.id])
+                mainMenu();
+            });
+        }
+    
     });
 }
 
@@ -289,28 +287,7 @@ const updateEmployMan = (lastName, newDepart) => {
         });
 
 };
-// const updateWorkforce = () => {
-//     const query = connection.query(
-//       'UPDATE employee SET ? WHERE ?',
-//       [
-//         {
-//           quantity: 100,
-//         },
-//         {
-//           flavor: 'Rocky Road',
-//         },
-//       ],
-//       (err, res) => {
-//         if (err) throw err;
-//         console.log(`${res.affectedRows} products updated!\n`);
-//         // Call deleteProduct AFTER the UPDATE completes
-//         deleteProduct();
-//       }
-//     );
 
-//     // logs the actual query being run
-//     console.log(query.sql);
-//   };
 
 //turns function into async function
 const create = async (first, last, roleChoice, managerChoice) => {
