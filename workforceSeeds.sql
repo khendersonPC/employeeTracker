@@ -32,31 +32,34 @@ alter table employee add foreign key (role_id) references role(id);
 alter table role add foreign key (department_id) references department(id);
 
 INSERT INTO department (name)
-VALUES ("CTE");
+VALUES ("Administation");
 
 INSERT INTO department (name)
 VALUES ("English");
 
 INSERT INTO department (name)
-VALUES ("Administration");
+VALUES ("Career Tech");
 
-INSERT INTO role (title, salary,department_id )
-VALUES ("CTE Teacher", 70000, 1);
+INSERT INTO department (name)
+VALUES ("Classified");
 
 INSERT INTO role (title, salary,department_id)
-VALUES ("Principal", 100000, 3);
+VALUES ("Principal", 100000, 1);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("Vice Principal", 85000, 3);
+VALUES ("Vice Principal", 85000, 1);
+
+INSERT INTO role (title, salary,department_id )
+VALUES ("Teacher", 70000, 2);
 
 INSERT INTO role (title, salary, department_id)
-VALUES ("English Teacher", 70000, 2);
+VALUES ("Custodian", 35000, 4);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Lindsay", "Hooker", 2, null);
+VALUES ("Lindsay", "Hooker", 1, null);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Chris", "Humbert", 1, 1);
+VALUES ("Chris", "Weeks", 2, 1);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("Roger", "Arlington", 2, null);
+VALUES ("Roger", "Arlington", 3, 2);
