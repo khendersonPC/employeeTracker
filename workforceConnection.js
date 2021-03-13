@@ -24,7 +24,7 @@ async function mainMenu() {
             type: 'list',
             name: 'main',
             message: 'Main Menu: ',
-            choices: ["View All Employees", "View Departments", "View Roles", "View Employees By Department", "View Employees by Manager", "Add Employee", "Add Department", "Add Role", "Remove Employee", "Update Employee Role", "Update Employee Manager"],
+            choices: ["View All Employees", "View Departments", "View Roles", "View Employees By Department", "View Employees by Manager", "Add Employee", "Add Department", "Add Role", "Remove Employee", "Update Employee Role", "Update Employee Manager", "END"],
         },
     ]
     //returns an array of objects with a row data package
@@ -200,7 +200,7 @@ async function mainMenu() {
                 {
                     type: 'list',
                     name: 'manager_id',
-                    message: 'Select the new role: ',
+                    message: 'Select the new manager: ',
                     choices: newLastNames,
                 }]
             inquirer.prompt(secMenu).then(async (data) => {
@@ -208,6 +208,10 @@ async function mainMenu() {
                 await query("UPDATE employee SET manager_id = ? WHERE id=?", [data.manager_id, data.id])
                 mainMenu();
             });
+        }
+
+        if (data.main == "END"){
+            process.exit(1);
         }
     
     });
